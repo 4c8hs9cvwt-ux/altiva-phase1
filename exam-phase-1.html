@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>امتحان المرحلة الأولى — ALTIVA Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-pale:#F5EDD4;--navy:#0D1B2A;--navy-mid:#1A2E45;--white:#FAFAF8;--text:#1A1A2E;--muted:#6B7280;--border:#E5E7EB;--pass:#10B981;--fail:#EF4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:var(--white);color:var(--text);line-height:1.8;}
+.exam-header{background:var(--navy);color:white;padding:36px 48px 30px;position:relative;overflow:hidden;}
+.exam-header::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold));}
+.badge{display:inline-block;background:var(--gold);color:var(--navy);font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;margin-bottom:10px;}
+.exam-header h1{font-size:24px;font-weight:900;line-height:1.4;margin-bottom:6px;}
+.exam-header p{font-size:13px;color:rgba(255,255,255,0.6);font-family:'Tajawal',sans-serif;}
+.meta-row{display:flex;gap:20px;margin-top:14px;flex-wrap:wrap;}
+.meta-chip{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.6);font-family:'Tajawal',sans-serif;}
+.progress-bar-wrap{background:rgba(255,255,255,0.1);border-radius:20px;height:8px;margin-top:16px;}
+.progress-bar{background:var(--gold);height:8px;border-radius:20px;width:0%;transition:width 0.4s;}
+.container{max-width:860px;margin:0 auto;padding:28px 24px 60px;}
+.instructions{background:var(--gold-pale);border:1px solid #E5D5A0;border-radius:14px;padding:18px 22px;margin-bottom:28px;}
+.instructions h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.instructions ul{list-style:none;}
+.instructions li{font-size:13px;font-family:'Tajawal',sans-serif;color:#78350F;padding:3px 0;padding-right:16px;position:relative;}
+.instructions li::before{content:'•';position:absolute;right:0;color:var(--gold);}
+.question-card{background:white;border:1px solid var(--border);border-radius:14px;padding:22px 20px;margin-bottom:18px;transition:border-color 0.2s;}
+.question-card.answered{border-color:var(--gold);}
+.q-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;}
+.q-num{width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--gold-light);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.q-text{font-size:14px;font-weight:700;color:var(--navy);line-height:1.6;}
+.opts-grid{display:flex;flex-direction:column;gap:8px;}
+.opt{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:9px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;font-family:'Tajawal',sans-serif;font-size:13px;color:var(--text);}
+.opt:hover{background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.4);}
+.opt.correct{background:rgba(16,185,129,0.1);border-color:#10B981;color:#065f46;}
+.opt.wrong{background:rgba(239,68,68,0.08);border-color:#EF4444;color:#991B1B;}
+.opt.reveal-correct{background:rgba(16,185,129,0.08);border-color:#10B981;color:#065f46;}
+.opt-letter{width:26px;height:26px;border-radius:50%;background:rgba(13,27,42,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.opt.correct .opt-letter,.opt.reveal-correct .opt-letter{background:#10B981;color:white;}
+.opt.wrong .opt-letter{background:#EF4444;color:white;}
+.explanation{margin-top:12px;padding:10px 14px;background:rgba(13,27,42,0.04);border-radius:8px;font-size:13px;font-family:'Tajawal',sans-serif;color:var(--navy-mid);border-right:3px solid var(--gold);line-height:1.7;}
+.submit-area{text-align:center;margin:32px 0;}
+.submit-btn{background:var(--navy);color:var(--gold-light);font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;padding:14px 48px;border:none;border-radius:12px;cursor:pointer;transition:background 0.2s;}
+.submit-btn:hover{background:var(--navy-mid);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.result-panel{display:none;background:var(--navy);border-radius:20px;padding:36px 28px;text-align:center;margin-top:28px;}
+.result-panel.pass{border-top:4px solid var(--pass);}
+.result-panel.fail{border-top:4px solid var(--fail);}
+.result-icon{font-size:56px;margin-bottom:14px;}
+.result-title{font-size:22px;font-weight:900;color:white;margin-bottom:8px;}
+.result-score{font-size:48px;font-weight:900;margin:14px 0;}
+.result-score.pass-score{color:var(--pass);}
+.result-score.fail-score{color:var(--fail);}
+.result-detail{font-size:14px;font-family:'Tajawal',sans-serif;color:rgba(255,255,255,0.7);line-height:1.8;}
+.score-bar-wrap{background:rgba(255,255,255,0.1);border-radius:20px;height:14px;margin:18px auto;max-width:400px;}
+.score-bar{height:14px;border-radius:20px;transition:width 1s;}
+.score-bar.pass-bar{background:var(--pass);}
+.score-bar.fail-bar{background:var(--fail);}
+.pass-line{display:flex;justify-content:flex-end;padding-left:20%;margin-top:4px;}
+.pass-marker{font-size:11px;color:rgba(255,255,255,0.5);font-family:'Tajawal',sans-serif;}
+.retry-btn{background:var(--gold);color:var(--navy);font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;padding:12px 36px;border:none;border-radius:10px;cursor:pointer;margin-top:18px;}
+.answered-count{text-align:center;font-family:'Tajawal',sans-serif;font-size:13px;color:var(--muted);margin-bottom:18px;}
+</style>
+</head>
+<body>
+
+<div class="exam-header">
+  <div style="max-width:860px;margin:0 auto;padding:0 24px;">
+    <div class="badge">امتحان المرحلة الأولى</div>
+    <h1>اختبار المرحلة الأولى: الأساسيات ومنهج ALTIVA والسوق الإماراتي</h1>
+    <p>الدروس ١–٣٠ · منهج ALTIVA · التواصل · قوانين السوق · ملف المستثمر · المفاهيم الأساسية</p>
+    <div class="meta-row">
+      <div class="meta-chip">📝 ٢٥ سؤالاً</div>
+      <div class="meta-chip">⏱ ٣٠ دقيقة</div>
+      <div class="meta-chip">🎯 الحد الأدنى للنجاح: ٨٠٪</div>
+      <div class="meta-chip">✦ ALTIVA Academy</div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="instructions">
+    <h3>تعليمات الاختبار</h3>
+    <ul>
+      <li>اختر إجابة واحدة لكل سؤال</li>
+      <li>بعد الاختيار تظهر الإجابة الصحيحة مع الشرح</li>
+      <li>أجب على جميع الأسئلة ثم اضغط "عرض النتيجة"</li>
+      <li>درجة النجاح ٨٠٪ فأكثر (٢٠ سؤالاً صحيحاً على الأقل)</li>
+    </ul>
+  </div>
+
+  <div class="answered-count" id="answeredCount">أجبت على <span id="ansCount">0</span> من 25 سؤال</div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="qcard0">
+    <div class="q-header"><span class="q-num">١</span><span class="q-text">ما المبدأ الأول والأساسي في منهج ALTIVA الاستشاري؟</span></div>
+    <div class="opts-grid" id="opts0">
+      <div class="opt" id="q0o0" onclick="selectOpt(0,0)"><span class="opt-letter">أ</span><span class="opt-text">العمولة أولاً</span></div>
+      <div class="opt" id="q0o1" onclick="selectOpt(0,1)"><span class="opt-letter">ب</span><span class="opt-text">العميل أولاً — مصلحته فوق مصلحة أي صفقة أو عمولة</span></div>
+      <div class="opt" id="q0o2" onclick="selectOpt(0,2)"><span class="opt-letter">ج</span><span class="opt-text">المطور أولاً</span></div>
+      <div class="opt" id="q0o3" onclick="selectOpt(0,3)"><span class="opt-letter">د</span><span class="opt-text">الصفقة أولاً</span></div>
+    </div>
+    <div class="explanation" id="exp0" style="display:none;">✅ الجواب: ب — العميل أولاً هو حجر الأساس في منهج ALTIVA — مصلحة العميل فوق مصلحة أي صفقة أو عمولة</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="qcard1">
+    <div class="q-header"><span class="q-num">٢</span><span class="q-text">قاعدة ALTIVA الذهبية في التواصل الأول مع عميل جديد هي؟</span></div>
+    <div class="opts-grid" id="opts1">
+      <div class="opt" id="q1o0" onclick="selectOpt(1,0)"><span class="opt-letter">أ</span><span class="opt-text">الرد خلال ٢٤ ساعة</span></div>
+      <div class="opt" id="q1o1" onclick="selectOpt(1,1)"><span class="opt-letter">ب</span><span class="opt-text">الرد خلال أسبوع كامل</span></div>
+      <div class="opt" id="q1o2" onclick="selectOpt(1,2)"><span class="opt-letter">ج</span><span class="opt-text">الرد خلال ١٠ دقائق</span></div>
+      <div class="opt" id="q1o3" onclick="selectOpt(1,3)"><span class="opt-letter">د</span><span class="opt-text">الانتظار حتى تجمع معلومات كافية</span></div>
+    </div>
+    <div class="explanation" id="exp1" style="display:none;">✅ الجواب: ج — ١٠ دقائق هي القاعدة الذهبية في ALTIVA — كل دقيقة تأخير تُعطي المنافس فرصة</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="qcard2">
+    <div class="q-header"><span class="q-num">٣</span><span class="q-text">ما الهيئة التنظيمية المسؤولة عن سوق العقارات في دبي؟</span></div>
+    <div class="opts-grid" id="opts2">
+      <div class="opt" id="q2o0" onclick="selectOpt(2,0)"><span class="opt-letter">أ</span><span class="opt-text">DLD فقط</span></div>
+      <div class="opt" id="q2o1" onclick="selectOpt(2,1)"><span class="opt-letter">ب</span><span class="opt-text">ADREC</span></div>
+      <div class="opt" id="q2o2" onclick="selectOpt(2,2)"><span class="opt-letter">ج</span><span class="opt-text">RERA التابعة لدائرة الأراضي والأملاك DLD</span></div>
+      <div class="opt" id="q2o3" onclick="selectOpt(2,3)"><span class="opt-letter">د</span><span class="opt-text">وزارة الاقتصاد الاتحادية</span></div>
+    </div>
+    <div class="explanation" id="exp2" style="display:none;">✅ الجواب: ج — RERA (Real Estate Regulatory Agency) هي ذراع التنظيم التابعة لـDLD في دبي</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="qcard3">
+    <div class="q-header"><span class="q-num">٤</span><span class="q-text">مستشار يُوصي بمشروع لأن عمولته أعلى لا لأنه الأنسب للعميل — هذا يُعدّ:</span></div>
+    <div class="opts-grid" id="opts3">
+      <div class="opt" id="q3o0" onclick="selectOpt(3,0)"><span class="opt-letter">أ</span><span class="opt-text">أسلوباً تجارياً مقبولاً</span></div>
+      <div class="opt" id="q3o1" onclick="selectOpt(3,1)"><span class="opt-letter">ب</span><span class="opt-text">خطأً أخلاقياً جوهرياً يُخالف مبادئ ALTIVA</span></div>
+      <div class="opt" id="q3o2" onclick="selectOpt(3,2)"><span class="opt-letter">ج</span><span class="opt-text">مسموحاً به إذا كان المشروع جيداً</span></div>
+      <div class="opt" id="q3o3" onclick="selectOpt(3,3)"><span class="opt-letter">د</span><span class="opt-text">لا بأس به إذا لم يعرف العميل</span></div>
+    </div>
+    <div class="explanation" id="exp3" style="display:none;">✅ الجواب: ب — مخالفة أخلاقية صريحة — العمولة تتبع التوصية الصحيحة وليس العكس</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="qcard4">
+    <div class="q-header"><span class="q-num">٥</span><span class="q-text">ما الفرق بين Freehold وLeasehold في العقار؟</span></div>
+    <div class="opts-grid" id="opts4">
+      <div class="opt" id="q4o0" onclick="selectOpt(4,0)"><span class="opt-letter">أ</span><span class="opt-text">لا فرق — كلاهما ملكية كاملة أبدية</span></div>
+      <div class="opt" id="q4o1" onclick="selectOpt(4,1)"><span class="opt-letter">ب</span><span class="opt-text">Freehold ملكية دائمة كاملة — Leasehold إيجار طويل الأمد بحد أقصى ٩٩ سنة</span></div>
+      <div class="opt" id="q4o2" onclick="selectOpt(4,2)"><span class="opt-letter">ج</span><span class="opt-text">Leasehold أغلى دائماً من Freehold</span></div>
+      <div class="opt" id="q4o3" onclick="selectOpt(4,3)"><span class="opt-letter">د</span><span class="opt-text">Freehold للإماراتيين فقط</span></div>
+    </div>
+    <div class="explanation" id="exp4" style="display:none;">✅ الجواب: ب — Freehold = ملكية أبدية كاملة. Leasehold = حق انتفاع لمدة محددة (عادة ٩٩ سنة)</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="qcard5">
+    <div class="q-header"><span class="q-num">٦</span><span class="q-text">عميل يسألك عن Off-Plan — ما تعريفه الصحيح؟</span></div>
+    <div class="opts-grid" id="opts5">
+      <div class="opt" id="q5o0" onclick="selectOpt(5,0)"><span class="opt-letter">أ</span><span class="opt-text">عقار قديم يُباع بسعر منخفض</span></div>
+      <div class="opt" id="q5o1" onclick="selectOpt(5,1)"><span class="opt-letter">ب</span><span class="opt-text">شراء عقار قبل إتمام بنائه من مطور بسعر إطلاق</span></div>
+      <div class="opt" id="q5o2" onclick="selectOpt(5,2)"><span class="opt-letter">ج</span><span class="opt-text">إيجار سنوي طويل المدى</span></div>
+      <div class="opt" id="q5o3" onclick="selectOpt(5,3)"><span class="opt-letter">د</span><span class="opt-text">عقار حكومي بأسعار مدعومة</span></div>
+    </div>
+    <div class="explanation" id="exp5" style="display:none;">✅ الجواب: ب — Off-Plan = شراء وحدة على الخريطة قبل اكتمال البناء بسعر إطلاق أقل من السوق</div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="qcard6">
+    <div class="q-header"><span class="q-num">٧</span><span class="q-text">ما المستند الذي يُثبت تسجيل عقد Off-Plan في دبي رسمياً؟</span></div>
+    <div class="opts-grid" id="opts6">
+      <div class="opt" id="q6o0" onclick="selectOpt(6,0)"><span class="opt-letter">أ</span><span class="opt-text">SPA فقط</span></div>
+      <div class="opt" id="q6o1" onclick="selectOpt(6,1)"><span class="opt-letter">ب</span><span class="opt-text">رسالة واتساب من المطور</span></div>
+      <div class="opt" id="q6o2" onclick="selectOpt(6,2)"><span class="opt-letter">ج</span><span class="opt-text">Oqood — عقد المشتري المسجّل في DLD</span></div>
+      <div class="opt" id="q6o3" onclick="selectOpt(6,3)"><span class="opt-letter">د</span><span class="opt-text">شهادة الإنجاز فقط</span></div>
+    </div>
+    <div class="explanation" id="exp6" style="display:none;">✅ الجواب: ج — Oqood هو نظام تسجيل عقود Off-Plan في دائرة الأراضي والأملاك — حماية قانونية للمستثمر</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card" id="qcard7">
+    <div class="q-header"><span class="q-num">٨</span><span class="q-text">ما نسبة رسوم التسجيل (DLD) عند شراء عقار في دبي؟</span></div>
+    <div class="opts-grid" id="opts7">
+      <div class="opt" id="q7o0" onclick="selectOpt(7,0)"><span class="opt-letter">أ</span><span class="opt-text">١٪</span></div>
+      <div class="opt" id="q7o1" onclick="selectOpt(7,1)"><span class="opt-letter">ب</span><span class="opt-text">٢٪</span></div>
+      <div class="opt" id="q7o2" onclick="selectOpt(7,2)"><span class="opt-letter">ج</span><span class="opt-text">٤٪</span></div>
+      <div class="opt" id="q7o3" onclick="selectOpt(7,3)"><span class="opt-letter">د</span><span class="opt-text">٨٪</span></div>
+    </div>
+    <div class="explanation" id="exp7" style="display:none;">✅ الجواب: ج — ٤٪ من سعر الشراء تُدفع لدائرة الأراضي والأملاك عند نقل الملكية</div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question-card" id="qcard8">
+    <div class="q-header"><span class="q-num">٩</span><span class="q-text">مستثمر كويتي يسأل: هل أحتاج إقامة إماراتية لشراء عقار في دبي؟</span></div>
+    <div class="opts-grid" id="opts8">
+      <div class="opt" id="q8o0" onclick="selectOpt(8,0)"><span class="opt-letter">أ</span><span class="opt-text">نعم — الإقامة شرط أساسي</span></div>
+      <div class="opt" id="q8o1" onclick="selectOpt(8,1)"><span class="opt-letter">ب</span><span class="opt-text">لا — الأجانب يملكون في مناطق Freehold بجواز السفر فقط</span></div>
+      <div class="opt" id="q8o2" onclick="selectOpt(8,2)"><span class="opt-letter">ج</span><span class="opt-text">نعم — لكن يمكن التوكيل لشخص آخر</span></div>
+      <div class="opt" id="q8o3" onclick="selectOpt(8,3)"><span class="opt-letter">د</span><span class="opt-text">يعتمد على الجنسية</span></div>
+    </div>
+    <div class="explanation" id="exp8" style="display:none;">✅ الجواب: ب — لا تحتاج إقامة — جواز سفر كويتي كافٍ لشراء عقار في مناطق Freehold بدبي</div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="question-card" id="qcard9">
+    <div class="q-header"><span class="q-num">١٠</span><span class="q-text">ما وظيفة حساب الضمان (Escrow Account) في مشاريع Off-Plan؟</span></div>
+    <div class="opts-grid" id="opts9">
+      <div class="opt" id="q9o0" onclick="selectOpt(9,0)"><span class="opt-letter">أ</span><span class="opt-text">حساب للمطور يُصرف منه الربح</span></div>
+      <div class="opt" id="q9o1" onclick="selectOpt(9,1)"><span class="opt-letter">ب</span><span class="opt-text">يحمي أموال المشتري ولا تُصرف للمطور إلا بنسب الإنجاز الفعلي</span></div>
+      <div class="opt" id="q9o2" onclick="selectOpt(9,2)"><span class="opt-letter">ج</span><span class="opt-text">حساب لدفع عمولات الوسطاء</span></div>
+      <div class="opt" id="q9o3" onclick="selectOpt(9,3)"><span class="opt-letter">د</span><span class="opt-text">حساب بنكي عادي للمطور</span></div>
+    </div>
+    <div class="explanation" id="exp9" style="display:none;">✅ الجواب: ب — حساب الضمان ضمانة قانونية تحمي أموال المشتري — المطور لا يصل لها إلا بإثبات الإنجاز الفعلي</div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="question-card" id="qcard10">
+    <div class="q-header"><span class="q-num">١١</span><span class="q-text">سيناريو: عميل يقول "أريد الاستثمار في دبي لكن لا أعرف من أين أبدأ." ما خطوتك الأولى؟</span></div>
+    <div class="opts-grid" id="opts10">
+      <div class="opt" id="q10o0" onclick="selectOpt(10,0)"><span class="opt-letter">أ</span><span class="opt-text">عرض فوري لأحدث مشروع لديك</span></div>
+      <div class="opt" id="q10o1" onclick="selectOpt(10,1)"><span class="opt-letter">ب</span><span class="opt-text">بناء ملف المستثمر الكامل — الهدف والميزانية والأفق والمخاطرة والاستخدام والتجربة</span></div>
+      <div class="opt" id="q10o2" onclick="selectOpt(10,2)"><span class="opt-letter">ج</span><span class="opt-text">إرسال قائمة بجميع المشاريع المتاحة</span></div>
+      <div class="opt" id="q10o3" onclick="selectOpt(10,3)"><span class="opt-letter">د</span><span class="opt-text">سؤاله عن ميزانيته فقط</span></div>
+    </div>
+    <div class="explanation" id="exp10" style="display:none;">✅ الجواب: ب — الملف أولاً دائماً — الأسئلة الستة تُحدد التوصية الصحيحة</div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="question-card" id="qcard11">
+    <div class="q-header"><span class="q-num">١٢</span><span class="q-text">ما الفرق الجوهري بين Gross Yield وNet Yield؟</span></div>
+    <div class="opts-grid" id="opts11">
+      <div class="opt" id="q11o0" onclick="selectOpt(11,0)"><span class="opt-letter">أ</span><span class="opt-text">لا فرق — كلاهما نفس النسبة</span></div>
+      <div class="opt" id="q11o1" onclick="selectOpt(11,1)"><span class="opt-letter">ب</span><span class="opt-text">Gross الإيجار ÷ السعر — Net صافي الدخل بعد كل التكاليف ÷ إجمالي الاستثمار</span></div>
+      <div class="opt" id="q11o2" onclick="selectOpt(11,2)"><span class="opt-letter">ج</span><span class="opt-text">Net دائماً أعلى من Gross</span></div>
+      <div class="opt" id="q11o3" onclick="selectOpt(11,3)"><span class="opt-letter">د</span><span class="opt-text">Gross للإيجار الطويل والـNet للقصير</span></div>
+    </div>
+    <div class="explanation" id="exp11" style="display:none;">✅ الجواب: ب — الفرق قد يصل ٢–٣٪ — Net هو الرقم الحقيقي الذي يصل للمستثمر فعلاً</div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="question-card" id="qcard12">
+    <div class="q-header"><span class="q-num">١٣</span><span class="q-text">ما السؤال الأول الذي تطرحه على مستثمر جديد قبل أي توصية؟</span></div>
+    <div class="opts-grid" id="opts12">
+      <div class="opt" id="q12o0" onclick="selectOpt(12,0)"><span class="opt-letter">أ</span><span class="opt-text">ما ميزانيتك؟</span></div>
+      <div class="opt" id="q12o1" onclick="selectOpt(12,1)"><span class="opt-letter">ب</span><span class="opt-text">ما المشروع الذي تُفضّله؟</span></div>
+      <div class="opt" id="q12o2" onclick="selectOpt(12,2)"><span class="opt-letter">ج</span><span class="opt-text">ما هدفك من الاستثمار؟</span></div>
+      <div class="opt" id="q12o3" onclick="selectOpt(12,3)"><span class="opt-letter">د</span><span class="opt-text">هل تُريد Off-Plan أم Ready؟</span></div>
+    </div>
+    <div class="explanation" id="exp12" style="display:none;">✅ الجواب: ج — الهدف أولاً — دخل إيجاري أم نمو رأس مال أم كليهما؟ يُحدد كل شيء بعده</div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="question-card" id="qcard13">
+    <div class="q-header"><span class="q-num">١٤</span><span class="q-text">ما معنى Oqood في منظومة التسجيل العقاري بدبي؟</span></div>
+    <div class="opts-grid" id="opts13">
+      <div class="opt" id="q13o0" onclick="selectOpt(13,0)"><span class="opt-letter">أ</span><span class="opt-text">رسوم التسجيل المدفوعة لـDLD</span></div>
+      <div class="opt" id="q13o1" onclick="selectOpt(13,1)"><span class="opt-letter">ب</span><span class="opt-text">نظام تسجيل عقود Off-Plan الرسمي في DLD</span></div>
+      <div class="opt" id="q13o2" onclick="selectOpt(13,2)"><span class="opt-letter">ج</span><span class="opt-text">شهادة إنجاز المبنى</span></div>
+      <div class="opt" id="q13o3" onclick="selectOpt(13,3)"><span class="opt-letter">د</span><span class="opt-text">عقد الإيجار الرسمي</span></div>
+    </div>
+    <div class="explanation" id="exp13" style="display:none;">✅ الجواب: ب — Oqood نظام DLD لتسجيل عقود المشترين في مشاريع Off-Plan — حماية قانونية كاملة</div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="question-card" id="qcard14">
+    <div class="q-header"><span class="q-num">١٥</span><span class="q-text">سيناريو: مطور يُقدّم عمولة ضعف السوق لتسويق مشروعه — ماذا تفعل أولاً؟</span></div>
+    <div class="opts-grid" id="opts14">
+      <div class="opt" id="q14o0" onclick="selectOpt(14,0)"><span class="opt-letter">أ</span><span class="opt-text">اقبل فوراً — العمولة مرتفعة والفرصة ممتازة</span></div>
+      <div class="opt" id="q14o1" onclick="selectOpt(14,1)"><span class="opt-letter">ب</span><span class="opt-text">تحقق من سجل المطور ومعايير RERA ووجود حساب ضمان قبل أي التزام</span></div>
+      <div class="opt" id="q14o2" onclick="selectOpt(14,2)"><span class="opt-letter">ج</span><span class="opt-text">رفض فوري دون تحقق</span></div>
+      <div class="opt" id="q14o3" onclick="selectOpt(14,3)"><span class="opt-letter">د</span><span class="opt-text">اسأل عملاءك إن كانوا مهتمين أولاً</span></div>
+    </div>
+    <div class="explanation" id="exp14" style="display:none;">✅ الجواب: ب — العمولة المرتفعة أحياناً مؤشر على مشروع يصعب تسويقه — التحقق الكامل أولاً دائماً</div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="question-card" id="qcard15">
+    <div class="q-header"><span class="q-num">١٦</span><span class="q-text">ما مناطق Freehold في دبي؟</span></div>
+    <div class="opts-grid" id="opts15">
+      <div class="opt" id="q15o0" onclick="selectOpt(15,0)"><span class="opt-letter">أ</span><span class="opt-text">كل دبي بلا استثناء</span></div>
+      <div class="opt" id="q15o1" onclick="selectOpt(15,1)"><span class="opt-letter">ب</span><span class="opt-text">مناطق محددة كـDowntown وMarina وJVC وPalm وغيرها</span></div>
+      <div class="opt" id="q15o2" onclick="selectOpt(15,2)"><span class="opt-letter">ج</span><span class="opt-text">المشاريع الحكومية فقط</span></div>
+      <div class="opt" id="q15o3" onclick="selectOpt(15,3)"><span class="opt-letter">د</span><span class="opt-text">المناطق التجارية فقط</span></div>
+    </div>
+    <div class="explanation" id="exp15" style="display:none;">✅ الجواب: ب — مناطق Freehold محددة تُتيح للأجانب التملّك الكامل — معظمها في المناطق التطويرية الكبرى</div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="question-card" id="qcard16">
+    <div class="q-header"><span class="q-num">١٧</span><span class="q-text">ما التصرف الصحيح إذا طلب منك عميل توصية لمشروع لا تعرف مطوره؟</span></div>
+    <div class="opts-grid" id="opts16">
+      <div class="opt" id="q16o0" onclick="selectOpt(16,0)"><span class="opt-letter">أ</span><span class="opt-text">قدّم التوصية بناءً على ما أخبرك به المطور</span></div>
+      <div class="opt" id="q16o1" onclick="selectOpt(16,1)"><span class="opt-letter">ب</span><span class="opt-text">أخبر العميل بأنه ممتاز لتوليد اهتمامه</span></div>
+      <div class="opt" id="q16o2" onclick="selectOpt(16,2)"><span class="opt-letter">ج</span><span class="opt-text">أجرِ Due Diligence كاملاً قبل أي توصية</span></div>
+      <div class="opt" id="q16o3" onclick="selectOpt(16,3)"><span class="opt-letter">د</span><span class="opt-text">وجّهه لمستشار آخر مباشرة</span></div>
+    </div>
+    <div class="explanation" id="exp16" style="display:none;">✅ الجواب: ج — Due Diligence لا تُكسر — تحقق من RERA وسجل التسليم والضمان قبل أي توصية</div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="question-card" id="qcard17">
+    <div class="q-header"><span class="q-num">١٨</span><span class="q-text">ما الهدف من إرسال ملخص كتابي للعميل بعد كل اجتماع؟</span></div>
+    <div class="opts-grid" id="opts17">
+      <div class="opt" id="q17o0" onclick="selectOpt(17,0)"><span class="opt-letter">أ</span><span class="opt-text">إثبات أنك عملت وقضيت وقتاً</span></div>
+      <div class="opt" id="q17o1" onclick="selectOpt(17,1)"><span class="opt-letter">ب</span><span class="opt-text">حماية نفسك قانونياً فقط</span></div>
+      <div class="opt" id="q17o2" onclick="selectOpt(17,2)"><span class="opt-letter">ج</span><span class="opt-text">إعطاء العميل مرجعاً + إظهار الاحترافية + الحضور الدائم في ذهنه</span></div>
+      <div class="opt" id="q17o3" onclick="selectOpt(17,3)"><span class="opt-letter">د</span><span class="opt-text">إرسال عروض إضافية تحت غطاء الملخص</span></div>
+    </div>
+    <div class="explanation" id="exp17" style="display:none;">✅ الجواب: ج — الملخص ثلاثة في واحد: مرجع للعميل + دليل احترافية + يُبقيك حاضراً في ذهنه</div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="question-card" id="qcard18">
+    <div class="q-header"><span class="q-num">١٩</span><span class="q-text">سيناريو: عميل قال "كل الناس يشترون في هذا المشروع!" — ما ردك الصحيح؟</span></div>
+    <div class="opts-grid" id="opts18">
+      <div class="opt" id="q18o0" onclick="selectOpt(18,0)"><span class="opt-letter">أ</span><span class="opt-text">"إذن عليك الاستعجال قبل أن تنتهي الوحدات!"</span></div>
+      <div class="opt" id="q18o1" onclick="selectOpt(18,1)"><span class="opt-letter">ب</span><span class="opt-text">"الإقبال العالي دليل جودة — اشترِ الآن"</span></div>
+      <div class="opt" id="q18o2" onclick="selectOpt(18,2)"><span class="opt-letter">ج</span><span class="opt-text">"دعنا نتحقق أن هذا المشروع يناسب ملفك تحديداً قبل أي قرار"</span></div>
+      <div class="opt" id="q18o3" onclick="selectOpt(18,3)"><span class="opt-letter">د</span><span class="opt-text">"هذا صحيح — المشروع رائع للجميع"</span></div>
+    </div>
+    <div class="explanation" id="exp18" style="display:none;">✅ الجواب: ج — ما نجح للآخرين قد لا يناسب ملفه — الملف هو المعيار لا الانتشار أو الإقبال</div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="question-card" id="qcard19">
+    <div class="q-header"><span class="q-num">٢٠</span><span class="q-text">ما الإطار الثلاثي لتقييم جودة أي تواصل في ALTIVA؟</span></div>
+    <div class="opts-grid" id="opts19">
+      <div class="opt" id="q19o0" onclick="selectOpt(19,0)"><span class="opt-letter">أ</span><span class="opt-text">السرعة والطول والصور</span></div>
+      <div class="opt" id="q19o1" onclick="selectOpt(19,1)"><span class="opt-letter">ب</span><span class="opt-text">الوضوح والاحترافية والقيمة المضافة</span></div>
+      <div class="opt" id="q19o2" onclick="selectOpt(19,2)"><span class="opt-letter">ج</span><span class="opt-text">الرسمية والطول والأسلوب</span></div>
+      <div class="opt" id="q19o3" onclick="selectOpt(19,3)"><span class="opt-letter">د</span><span class="opt-text">الودّية والطول والسرعة</span></div>
+    </div>
+    <div class="explanation" id="exp19" style="display:none;">✅ الجواب: ب — كل تواصل في ALTIVA يُقيَّم على: هل هو واضح؟ هل هو احترافي؟ هل يُضيف قيمة؟</div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="question-card" id="qcard20">
+    <div class="q-header"><span class="q-num">٢١</span><span class="q-text">ما المقصود بـService Charge في الاستثمار العقاري بدبي؟</span></div>
+    <div class="opts-grid" id="opts20">
+      <div class="opt" id="q20o0" onclick="selectOpt(20,0)"><span class="opt-letter">أ</span><span class="opt-text">رسوم DLD عند الشراء</span></div>
+      <div class="opt" id="q20o1" onclick="selectOpt(20,1)"><span class="opt-letter">ب</span><span class="opt-text">رسوم سنوية تُدفع لإدارة المبنى والمرافق المشتركة</span></div>
+      <div class="opt" id="q20o2" onclick="selectOpt(20,2)"><span class="opt-letter">ج</span><span class="opt-text">عمولة الوسيط العقاري</span></div>
+      <div class="opt" id="q20o3" onclick="selectOpt(20,3)"><span class="opt-letter">د</span><span class="opt-text">رسوم تجديد عقد الإيجار</span></div>
+    </div>
+    <div class="explanation" id="exp20" style="display:none;">✅ الجواب: ب — Service Charge رسوم سنوية تُدفع للمطور أو شركة الإدارة لصيانة المبنى والمرافق المشتركة</div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="question-card" id="qcard21">
+    <div class="q-header"><span class="q-num">٢٢</span><span class="q-text">عميل يسأل عن الإقامة الذهبية في دبي — ما شرطها العقاري الأساسي؟</span></div>
+    <div class="opts-grid" id="opts21">
+      <div class="opt" id="q21o0" onclick="selectOpt(21,0)"><span class="opt-letter">أ</span><span class="opt-text">أي عقار في دبي بأي قيمة</span></div>
+      <div class="opt" id="q21o1" onclick="selectOpt(21,1)"><span class="opt-letter">ب</span><span class="opt-text">شراء عقار بقيمة ٢ مليون درهم أو أكثر</span></div>
+      <div class="opt" id="q21o2" onclick="selectOpt(21,2)"><span class="opt-letter">ج</span><span class="opt-text">الإقامة في دبي لمدة ٥ سنوات متواصلة أولاً</span></div>
+      <div class="opt" id="q21o3" onclick="selectOpt(21,3)"><span class="opt-letter">د</span><span class="opt-text">امتلاك ٣ عقارات على الأقل</span></div>
+    </div>
+    <div class="explanation" id="exp21" style="display:none;">✅ الجواب: ب — الإقامة الذهبية (١٠ سنوات) تتطلب شراء عقار بقيمة ٢ مليون درهم فأكثر</div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="question-card" id="qcard22">
+    <div class="q-header"><span class="q-num">٢٣</span><span class="q-text">ما أفضل طريقة للتعامل مع عميل متردد يقول "سأفكر وسأتصل بك"؟</span></div>
+    <div class="opts-grid" id="opts22">
+      <div class="opt" id="q22o0" onclick="selectOpt(22,0)"><span class="opt-letter">أ</span><span class="opt-text">اضغط عليه لاتخاذ القرار الآن</span></div>
+      <div class="opt" id="q22o1" onclick="selectOpt(22,1)"><span class="opt-letter">ب</span><span class="opt-text">اتركه تماماً دون أي متابعة</span></div>
+      <div class="opt" id="q22o2" onclick="selectOpt(22,2)"><span class="opt-letter">ج</span><span class="opt-text">أرسل ملخصاً كاملاً وجدّد التواصل بعد أسبوع بمعلومة جديدة مفيدة</span></div>
+      <div class="opt" id="q22o3" onclick="selectOpt(22,3)"><span class="opt-letter">د</span><span class="opt-text">أخبره أن السعر سيرتفع قريباً لتسريع قراره</span></div>
+    </div>
+    <div class="explanation" id="exp22" style="display:none;">✅ الجواب: ج — الملخص الكتابي + المتابعة بقيمة مضافة بعد أسبوع — لا ضغط ولا تجاهل</div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="question-card" id="qcard23">
+    <div class="q-header"><span class="q-num">٢٤</span><span class="q-text">ما الكتمان المهني ولماذا هو ركيزة أخلاقية لا تُكسر في ALTIVA؟</span></div>
+    <div class="opts-grid" id="opts23">
+      <div class="opt" id="q23o0" onclick="selectOpt(23,0)"><span class="opt-letter">أ</span><span class="opt-text">عدم الكلام مع المنافسين</span></div>
+      <div class="opt" id="q23o1" onclick="selectOpt(23,1)"><span class="opt-letter">ب</span><span class="opt-text">الحفاظ على سرية معلومات العملاء وعدم مشاركتها مع أي طرف</span></div>
+      <div class="opt" id="q23o2" onclick="selectOpt(23,2)"><span class="opt-letter">ج</span><span class="opt-text">رفض الحديث عن المشاريع علناً</span></div>
+      <div class="opt" id="q23o3" onclick="selectOpt(23,3)"><span class="opt-letter">د</span><span class="opt-text">عدم النشر على وسائل التواصل الاجتماعي</span></div>
+    </div>
+    <div class="explanation" id="exp23" style="display:none;">✅ الجواب: ب — الكتمان المهني مطلق — العميل أمنك على ميزانيته وأهدافه وهذه أمانة لا تُكسر أبداً</div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="question-card" id="qcard24">
+    <div class="q-header"><span class="q-num">٢٥</span><span class="q-text">سيناريو ختامي: ملف مستثمر — هدفه دخل إيجاري، ميزانيته ٦٥٠K، أفق ٣ سنوات، محافظ، أول تجربة. ما التوصية الصحيحة؟</span></div>
+    <div class="opts-grid" id="opts24">
+      <div class="opt" id="q24o0" onclick="selectOpt(24,0)"><span class="opt-letter">أ</span><span class="opt-text">Off-Plan في منطقة ناشئة لأعلى عائد ممكن</span></div>
+      <div class="opt" id="q24o1" onclick="selectOpt(24,1)"><span class="opt-letter">ب</span><span class="opt-text">Ready 1BR في JVC أو Business Bay من مطور موثوق — عائد ٦٪+ مع أمان وسيولة</span></div>
+      <div class="opt" id="q24o2" onclick="selectOpt(24,2)"><span class="opt-letter">ج</span><span class="opt-text">Palm Jumeirah للقيمة الرمزية</span></div>
+      <div class="opt" id="q24o3" onclick="selectOpt(24,3)"><span class="opt-letter">د</span><span class="opt-text">عجمان لأعلى نسبة عائد في الإمارات</span></div>
+    </div>
+    <div class="explanation" id="exp24" style="display:none;">✅ الجواب: ب — المحافظ في أول تجربة يحتاج يقيناً كاملاً — Ready من مطور راسخ في منطقة سيولة عالية هي المعادلة المثالية</div>
+  </div>
+
+  <div class="submit-area">
+    <button class="submit-btn" id="submitBtn" onclick="showResult()" disabled>عرض النتيجة الكاملة</button>
+  </div>
+
+  <div class="result-panel" id="resultPanel">
+    <div class="result-icon" id="resultIcon"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="score-bar-wrap"><div class="score-bar" id="scoreBar"></div></div>
+    <div class="pass-line"><span class="pass-marker">الحد الأدنى ٨٠٪ ←</span></div>
+    <div class="result-detail" id="resultDetail"></div>
+    <br>
+    <button class="retry-btn" onclick="retryExam()">إعادة الاختبار</button>
+  </div>
+</div>
+
+<script>
+const ANSWERS = [1,2,2,1,1,1,2,2,1,1,1,1,2,1,1,1,2,2,2,1,1,1,2,1,1];
+const TOTAL = 25;
+let userAnswers = new Array(TOTAL).fill(-1);
+let answered = 0;
+
+function selectOpt(qi, oi) {
+  if (userAnswers[qi] !== -1) return;
+  userAnswers[qi] = oi;
+  answered++;
+  document.getElementById('ansCount').textContent = answered;
+  document.getElementById('progressBar').style.width = (answered/TOTAL*100)+'%';
+  document.getElementById('qcard'+qi).classList.add('answered');
+  const correct = ANSWERS[qi];
+  for (let j=0;j<4;j++) {
+    const el = document.getElementById('q'+qi+'o'+j);
+    el.style.cursor='default';
+    el.onclick=null;
+    if (j===oi && oi===correct) el.classList.add('correct');
+    else if (j===oi && oi!==correct) el.classList.add('wrong');
+    else if (j===correct) el.classList.add('reveal-correct');
+  }
+  document.getElementById('exp'+qi).style.display='block';
+  if (answered===TOTAL) document.getElementById('submitBtn').disabled=false;
+}
+
+function showResult() {
+  let score=0;
+  for(let i=0;i<TOTAL;i++) if(userAnswers[i]===ANSWERS[i]) score++;
+  const pct=Math.round(score/TOTAL*100);
+  const pass=pct>=80;
+  const panel=document.getElementById('resultPanel');
+  panel.style.display='block';
+  panel.className='result-panel '+(pass?'pass':'fail');
+  document.getElementById('resultIcon').textContent=pass?'🏆':'📚';
+  document.getElementById('resultTitle').textContent=pass?'تهانينا — اجتزت امتحان المرحلة الأولى بنجاح!':'لم تصل للحد الأدنى بعد — راجع الدروس وحاول مجدداً';
+  const scoreEl=document.getElementById('resultScore');
+  scoreEl.textContent=pct+'٪';
+  scoreEl.className='result-score '+(pass?'pass-score':'fail-score');
+  const bar=document.getElementById('scoreBar');
+  bar.className='score-bar '+(pass?'pass-bar':'fail-bar');
+  setTimeout(()=>{bar.style.width=pct+'%';},100);
+  document.getElementById('resultDetail').innerHTML=
+    'أجبت على <strong>'+score+'</strong> سؤالاً صحيحاً من أصل <strong>'+TOTAL+'</strong><br>درجتك: <strong>'+pct+'٪</strong> | الحد الأدنى: <strong>٨٠٪</strong><br><br>'+
+    (pass?'لقد أثبتت إتقانك لمرحلة الأساسيات. يمكنك الانتقال لامتحان المرحلة الثانية.':
+    'راجع دروس المرحلة الأولى (١–٣٠) ثم حاول مجدداً. التكرار هو طريق الإتقان.');
+  panel.scrollIntoView({behavior:'smooth'});
+}
+
+function retryExam() {
+  userAnswers=new Array(TOTAL).fill(-1);
+  answered=0;
+  document.getElementById('ansCount').textContent='0';
+  document.getElementById('progressBar').style.width='0%';
+  document.getElementById('submitBtn').disabled=true;
+  document.getElementById('resultPanel').style.display='none';
+  for(let i=0;i<TOTAL;i++){
+    document.getElementById('qcard'+i).classList.remove('answered');
+    document.getElementById('exp'+i).style.display='none';
+    for(let j=0;j<4;j++){
+      const el=document.getElementById('q'+i+'o'+j);
+      el.className='opt';
+      const qi=i, oi=j;
+      el.onclick=function(){selectOpt(qi,oi);};
+    }
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
